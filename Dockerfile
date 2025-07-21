@@ -1,14 +1,14 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS dev
 
-WORKDIR /app
-
-COPY *.csproj ./
-RUN dotnet restore
-
+WORKDIR /src
 COPY . .
 
-ENV ASPNETCORE_URLS=http://+:5000
+# Pastikan tool watch tersedia (biasanya sudah di SDK, tapi jaga-jaga)
+RUN dotnet tool install --global dotnet-watch
+ENV PATH="${PATH}:/root/.dotnet/tools"
 
-EXPOSE 5000
+# Masuk ke folder project .csproj kamu
+WORKDIR /src/MyWebApi
 
-CMD ["dotnet", "run"]
+# Jalankan dengan watch
+CMD ["dotnet", "watch", "run", "--urls=http://0.0.0.0:5000"]

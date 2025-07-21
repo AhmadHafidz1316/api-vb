@@ -2,22 +2,36 @@ version: '3.8'
 
 services:
   webapi:
-    image: Aspnet/webapi:1.0.2
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: aspnet-api
     ports:
       - "5000:5000"
+    volumes:
+      - .:/src
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=finshark;User Id=sa;Password=AHMADhafidz1312;Encrypt=False;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver1,1433;Database=finshark;User Id=sa;Password=AHMADhafidz1312;Encrypt=False;
+      - Redis__Configuration=redis:6379          # Contoh environment variable untuk Redis connection string
+    working_dir: /src
+    command: dotnet watch run --project /src/MyApiApp.csproj --urls http://0.0.0.0:5000
     depends_on:
-      - sqlserver
+      - sqlserver1
+      - redis
 
-  sqlserver:
+  sqlserver1:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
+    container_name: sqlserver2
     ports:
       - "1433:1433"
     environment:
       - SA_PASSWORD=AHMADhafidz1312
       - ACCEPT_EULA=Y
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis1
+    ports:
+      - "6379:6379"

@@ -23,8 +23,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 
+var redisConnectionString = builder.Configuration.GetValue<string>("Redis:Configuration") ?? "redis:6379,abortConnect=false";
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect("localhost:6379"));
+    ConnectionMultiplexer.Connect(redisConnectionString));
+
 
 // Konfigurasi Swagger dengan security
 builder.Services.AddSwaggerGen(option =>
